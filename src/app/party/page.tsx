@@ -5,9 +5,9 @@ export const runtime = "edge";
 
 export default async function Party() {
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <Link href="/Home">Home</Link>
+    <div className="flex flex-col items-center justify-center h-[calc(100%-60px)]">
+      {/* <Link href="/Home">Home</Link> */}
       <TypeParty />
-    </main>
+    </div>
   );
 }

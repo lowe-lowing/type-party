@@ -15,23 +15,21 @@ export const useTypeListener = (letters: Letter[], setLetters: React.Dispatch<Re
         setLetters((prev) => {
           const updatedLetters = [...prev];
           updatedLetters[currentLetterIndex - 1].status = "current";
+          updatedLetters[currentLetterIndex].status = "upcoming";
           return updatedLetters;
         });
         setCurrentLetterIndex((prev) => prev - 1);
-      } else if (e.key === letters[currentLetterIndex].letter && currentLetterIndex < letters.length) {
-        setLetters((prev) => {
-          const updatedLetters = [...prev];
-          updatedLetters[currentLetterIndex].status = "completed";
-          if (currentLetterIndex + 1 < letters.length) {
-            updatedLetters[currentLetterIndex + 1].status = "current";
-          }
-          return updatedLetters;
-        });
-        setCurrentLetterIndex((prev) => prev + 1);
       } else {
         setLetters((prev) => {
           const updatedLetters = [...prev];
-          updatedLetters[currentLetterIndex].status = "failed";
+
+          updatedLetters[currentLetterIndex].status =
+            e.key === letters[currentLetterIndex].letter && currentLetterIndex < letters.length
+              ? "completed"
+              : "failed";
+          if (currentLetterIndex + 1 < letters.length) {
+            updatedLetters[currentLetterIndex + 1].status = "current";
+          }
           return updatedLetters;
         });
         setCurrentLetterIndex((prev) => prev + 1);
