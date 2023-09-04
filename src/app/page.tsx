@@ -4,7 +4,7 @@ import TodoList from "@/components/TodoList";
 import Link from "next/link";
 import { SocketIndicator } from "@/components/SocketTesting/SocketIndicator";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 export default async function Home() {
   const todos = await serverClient.getTodos();

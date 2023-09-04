@@ -1,7 +1,7 @@
 import Link from "next/link";
 import TypeParty from "@/components/TypeParty";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 export default async function Party() {
   return (
