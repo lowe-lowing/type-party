@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { publicProcedure, router } from "./trpc";
-import { todos } from "@/db/schema";
+import { todos } from "@/lib/db/schema";
 
 import { sql } from "@vercel/postgres";
 import { drizzle } from "drizzle-orm/vercel-postgres";

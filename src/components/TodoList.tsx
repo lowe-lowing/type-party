@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 
-import { trpc } from "../_trpc/client";
-import { serverClient } from "../_trpc/serverClient";
+import { trpc } from "../app/_trpc/client";
+import { serverClient } from "../app/_trpc/serverClient";
 
 export default function TodoList({ initialTodos }: { initialTodos: Awaited<ReturnType<(typeof serverClient)["getTodos"]>> }) {
   const getTodos = trpc.getTodos.useQuery(undefined, {
@@ -28,7 +28,7 @@ export default function TodoList({ initialTodos }: { initialTodos: Awaited<Retur
 
   return (
     <div>
-      <div className="text-black my-5 text-3xl">
+      <div className="my-5 text-3xl">
         {getTodos?.data?.map((todo) => (
           <div key={todo.id} className="flex gap-3 items-center">
             <input
