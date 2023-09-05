@@ -1,61 +1,119 @@
 "use client";
-import { useTypeListener } from "@/lib/hooks/useTypeListener";
+import { useTypeListener } from "@/hooks/useTypeListener";
 import { cn } from "@/lib/utils";
 import { useState, type FC } from "react";
 import { useTimer } from "react-timer-hook";
+import GameFinished from "./GameFinished";
+import { PusherEvent, usePusher } from "@/hooks/usePusher";
+import { trpc } from "@/app/_trpc/client";
+import { useSearchParams } from "next/navigation";
 
-export interface Letter {
-  id: number;
+type Letter = {
   letter: string;
   status: "completed" | "current" | "upcoming" | "failed";
-}
+};
 
+type Word = {
+  status: "completed" | "uncompleted" | "failed";
+  letters: Letter[];
+};
+export type Words = Word[];
+
+type GameFinishedData = {
+  player: number;
+  score: number;
+};
 interface TypingClientProps {
   words: string[];
 }
 
 const TypingClient: FC<TypingClientProps> = ({ words }) => {
-  const [letters, setLetters] = useState<Letter[]>(
-    words
-      .join(" ")
-      .split("")
-      .map((letter, i) => ({ id: i, letter, status: "upcoming" }))
+  const [wordsState, setWordsState] = useState<Words>(
+    words.map((word) => ({
+      status: "uncompleted",
+      letters: [...word.split(""), " "].map((letter) => ({ letter, status: "upcoming" })),
+    }))
   );
-  useTypeListener(letters, setLetters);
+  useTypeListener(wordsState, setWordsState);
+
+  const searchParams = useSearchParams();
+  const player = searchParams?.get("player") as string;
+
+  const [gameFinished, setGameFinished] = useState(false);
+  const [player1Score, setPlayer1Score] = useState<number | null>(null);
+  const [player2Score, setPlayer2Score] = useState<number | null>(null);
+
+  usePusher("game", [
+    {
+      event: "game_finished",
+      func: (data) => {
+        if (data.player === 1) {
+          setPlayer1Score(data.score);
+        }
+        if (data.player === 2) {
+          setPlayer2Score(data.score);
+        }
+      },
+    } as PusherEvent<GameFinishedData>,
+  ]);
+
+  const { mutateAsync: trigger } = trpc.pusher.trigger.useMutation();
+  const extractWPM = () => {
+    const completedWords = wordsState.filter((word) => {
+      const removeLastLetter = word.letters.slice(0, -1);
+      console.log(removeLastLetter);
+
+      const completedLetters = removeLastLetter.filter((letter) => letter.status === "completed");
+      return completedLetters.length === word.letters.length - 1;
+    });
+    // förutsatt att antal sekunder är 30
+    const wpm = completedWords.length * 2;
+    return wpm;
+  };
+
+  const endGame = async () => {
+    const score = extractWPM();
+    await trigger({
+      channel: "game",
+      event: "game_finished",
+      data: {
+        player: parseInt(player),
+        score,
+      } as GameFinishedData,
+    });
+    setGameFinished(true);
+  };
 
   const time = new Date();
   time.setSeconds(time.getSeconds() + 30);
-  const { seconds } = useTimer({ expiryTimestamp: time, onExpire: () => console.log("expired") });
+  const { seconds } = useTimer({ expiryTimestamp: time, onExpire: () => endGame() });
 
-  let index = 0;
-
+  if (gameFinished && player1Score && player2Score) {
+    return <GameFinished player1Score={player1Score} player2Score={player2Score} />;
+  }
   return (
     <div className="flex flex-col justify-center">
       <p>{seconds}</p>
       <div className="flex whitespace-pre-wrap max-w-[80vh] flex-wrap">
-        {words.map((word, i) => {
-          const wordLetters = [...word.split(""), " "].map((letter) => ({ letter, status: "upcoming" }));
+        {wordsState.map((word, i) => {
           return (
             <div key={i} className="flex">
-              {wordLetters.map((l, j) => {
-                const lt = letters[index];
-                index++;
-
+              {word.letters.map((l, j) => {
                 return (
                   <div className="relative" key={j}>
                     <div
                       className={cn("w-[1px] h-8 absolute left-0", {
-                        "bg-white animate-pulse": lt?.status === "current",
+                        "bg-white animate-pulse": l?.status === "current",
                       })}
                     />
                     <p
                       key={i}
                       className={cn("leading-8 text-gray-500 text-2xl", {
-                        "text-green-500": lt?.status === "completed",
-                        "text-red-500": lt?.status === "failed",
+                        "text-green-500": l?.status === "completed",
+                        "text-red-500": l?.status === "failed",
                       })}
                     >
-                      {lt?.letter}
+                      {l?.letter}
                     </p>
                   </div>
                 );

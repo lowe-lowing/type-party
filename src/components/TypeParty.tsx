@@ -1,14 +1,12 @@
 "use client";
-import { useEffect, type FC, useState } from "react";
-import TypingClient from "@/components/TypingClient";
-import { generate } from "random-words";
-import { useSocket } from "./providers/SocketProvider";
-import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
+import { trpc } from "@/app/_trpc/client";
+import { PusherEvent, usePusher } from "@/hooks/usePusher";
 import { useSearchParams } from "next/navigation";
-import { SocketIndicator } from "./SocketTesting/SocketIndicator";
-import axios from "axios";
+import { generate } from "random-words";
+import { useState, type FC } from "react";
+import ConnectedIndicator from "./ConnectedIndicator";
 import GameStarting from "./GameStarting";
+import { Button } from "./ui/button";
 
 interface TypePartyProps {}
 
@@ -22,37 +20,43 @@ const TypeParty: FC<TypePartyProps> = ({}) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [data, setData] = useState<string[]>([]);
 
-  const { socket } = useSocket();
-  useEffect(() => {
-    if (!socket || !player) {
-      return;
-    }
+  const { connected } = usePusher("game", [
+    {
+      event: "ready_up",
+      func: (player) => {
+        if (parseInt(player) === 1) {
+          setPlayer1Ready(true);
+        } else if (parseInt(player) === 2) {
+          setPlayer2Ready(true);
+        }
+      },
+    } as PusherEvent<string>,
+    {
+      event: "start_game",
+      func: (data) => {
+        setData(data);
+        setGameStarted(true);
+      },
+    } as PusherEvent<string[]>,
+  ]);
 
-    socket.on("ready_up", (player: string) => {
-      if (parseInt(player) === 1) {
-        setPlayer1Ready(true);
-      } else if (parseInt(player) === 2) {
-        setPlayer2Ready(true);
-      }
-    });
-
-    socket.on("start_game", (data: string[]) => {
-      setData(data);
-      setGameStarted(true);
-    });
-
-    return () => {
-      socket.off("ready_up");
-    };
-  }, [socket, player]);
+  const { mutate: trigger } = trpc.pusher.trigger.useMutation();
 
   const readyUp = () => {
-    axios.post("/api/socket/emit", { channel: "ready_up", message: player });
+    trigger({
+      channel: "game",
+      event: "ready_up",
+      data: player,
+    });
   };
 
   const startGame = async () => {
     const data = generate(50);
-    await axios.post("/api/socket/emit", { channel: "start_game", message: data });
+    trigger({
+      channel: "game",
+      event: "start_game",
+      data,
+    });
   };
 
   if (gameStarted) {
@@ -62,7 +66,7 @@ const TypeParty: FC<TypePartyProps> = ({}) => {
   return (
     <div className="w-full flex h-full flex-col items-center justify-center">
       <div className="w-fit">
-        <SocketIndicator />
+        <ConnectedIndicator connected={connected} />
       </div>
       <div className="grid w-full h-[50%]" style={{ gridTemplateColumns: "1fr 1fr" }}>
         <div className="w-full h-full flex flex-col justify-center items-center">
@@ -104,13 +108,3 @@ const TypeParty: FC<TypePartyProps> = ({}) => {
 };
 
 export default TypeParty;
-
-// display a connected indicator for player 1 and player 2
-// when both players are connected, display a start button for player 1
-// run a function that creates the words for the game, and sends them to both clients via socket
-
-// const data = generate(50);
-
-// return <TypingClient words={data} />;
-
-// Get the query parameter from the URL

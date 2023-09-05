@@ -5,7 +5,6 @@ import TrpcClientProvider from "./_trpc/provider";
 import Navbar from "@/components/Navbar/Navbar";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import { Separator } from "@/components/ui/separator";
-import { SocketProvider } from "@/components/providers/SocketProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,13 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <TrpcClientProvider>
           <ThemeProvider attribute="class" defaultTheme="dark">
-            <SocketProvider>
-              <div className="min-h-screen grid" style={{ gridTemplateRows: "auto auto 1fr" }}>
-                <Navbar />
-                <Separator />
-                <div className="container">{children}</div>
-              </div>
-            </SocketProvider>
+            <div className="min-h-screen grid" style={{ gridTemplateRows: "auto auto 1fr" }}>
+              <Navbar />
+              <Separator />
+              <div className="container">{children}</div>
+            </div>
           </ThemeProvider>
         </TrpcClientProvider>
       </body>
