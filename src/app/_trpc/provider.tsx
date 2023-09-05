@@ -11,7 +11,7 @@ export default function TrpcClientProvider({ children }: { children: React.React
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: `${process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000/"}api/trpc`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000/"}api/trpc`,
         }),
       ],
     })
