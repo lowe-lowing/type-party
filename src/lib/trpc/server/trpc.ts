@@ -3,7 +3,7 @@ import SuperJSON from "superjson";
 
 import { type Context } from "../context";
 
-const t = initTRPC.context<Context>().create({
+const t = initTRPC.create({
   transformer: SuperJSON,
   errorFormatter({ shape }) {
     return shape;
@@ -13,7 +13,16 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-const isAuthed = t.middleware(({ ctx, next }) => {
+const tAuth = initTRPC.context<Context>().create({
+  transformer: SuperJSON,
+  errorFormatter({ shape }) {
+    return shape;
+  },
+});
+
+export const routerAuth = t.router;
+
+const isAuthed = tAuth.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -24,4 +33,4 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(isAuthed);
+export const protectedProcedure = tAuth.procedure.use(isAuthed);

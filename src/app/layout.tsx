@@ -1,10 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import TrpcClientProvider from "../lib/trpc/provider";
+import TrpcClientProvider from "../components/providers/TrpcClientProvider";
 import Navbar from "@/components/Navbar/Navbar";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import { Separator } from "@/components/ui/separator";
+import AuthProvider from "@/components/providers/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,15 +18,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <TrpcClientProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark">
-            <div className="min-h-screen grid" style={{ gridTemplateRows: "auto auto 1fr" }}>
-              <Navbar />
-              <Separator />
-              <div className="container">{children}</div>
-            </div>
-          </ThemeProvider>
-        </TrpcClientProvider>
+        <AuthProvider>
+          <TrpcClientProvider>
+            <ThemeProvider attribute="class" defaultTheme="dark">
+              <div className="min-h-screen grid" style={{ gridTemplateRows: "auto auto 1fr" }}>
+                <Navbar />
+                <Separator />
+                <div className="container">{children}</div>
+              </div>
+            </ThemeProvider>
+          </TrpcClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );
