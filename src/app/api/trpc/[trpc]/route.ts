@@ -1,5 +1,5 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "@/server";
+import { appRouter } from "@/lib/trpc/server/router/_app";
 
 // export const runtime = "edge";
 

@@ -1,16 +1,10 @@
+import { todos } from "@/lib/db/schema/todos";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure, router } from "./trpc";
-import { todos } from "@/lib/db/schema";
-
-import { sql } from "@vercel/postgres";
-import { drizzle } from "drizzle-orm/vercel-postgres";
-import { pusherRouter } from "./routers/pusher";
-
-const db = drizzle(sql);
+import { publicProcedure, router } from "../trpc";
+import { db } from "@/lib/db";
 
 export const appRouter = router({
-  pusher: pusherRouter,
   getTodos: publicProcedure.query(async () => {
     return db.select().from(todos).orderBy(todos.id);
   }),

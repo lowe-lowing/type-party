@@ -4,14 +4,17 @@ import { httpBatchLink } from "@trpc/client";
 import React, { useState } from "react";
 
 import { trpc } from "./client";
+import SuperJSON from "superjson";
+import { getUrl } from "./utils";
 
 export default function TrpcClientProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({}));
   const [trpcClient] = useState(() =>
     trpc.createClient({
+      transformer: SuperJSON,
       links: [
         httpBatchLink({
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000/"}api/trpc`,
+          url: getUrl(),
         }),
       ],
     })

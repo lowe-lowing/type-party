@@ -5,8 +5,10 @@ import { useState, type FC } from "react";
 import { useTimer } from "react-timer-hook";
 import GameFinished from "./GameFinished";
 import { PusherEvent, usePusher } from "@/hooks/usePusher";
-import { trpc } from "@/app/_trpc/client";
+import { trpc } from "@/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
+import axios from "axios";
+import { TriggerPayload } from "@/app/api/pusher/route";
 
 type Letter = {
   letter: string;
@@ -23,6 +25,7 @@ type GameFinishedData = {
   player: number;
   score: number;
 };
+
 interface TypingClientProps {
   words: string[];
 }
@@ -57,7 +60,7 @@ const TypingClient: FC<TypingClientProps> = ({ words }) => {
     } as PusherEvent<GameFinishedData>,
   ]);
 
-  const { mutateAsync: trigger } = trpc.pusher.trigger.useMutation();
+  // const { mutateAsync: trigger } = trpc.pusher.trigger.useMutation();
   const extractWPM = () => {
     const completedWords = wordsState.filter((word) => {
       const removeLastLetter = word.letters.slice(0, -1);
@@ -73,14 +76,22 @@ const TypingClient: FC<TypingClientProps> = ({ words }) => {
 
   const endGame = async () => {
     const score = extractWPM();
-    await trigger({
+    axios.post("/api/pusher", {
       channel: "game",
       event: "game_finished",
       data: {
         player: parseInt(player),
         score,
       } as GameFinishedData,
-    });
+    } as TriggerPayload);
+    // await trigger({
+    //   channel: "game",
+    //   event: "game_finished",
+    //   data: {
+    //     player: parseInt(player),
+    //     score,
+    //   } as GameFinishedData,
+    // });
     setGameFinished(true);
   };
 
@@ -88,7 +99,7 @@ const TypingClient: FC<TypingClientProps> = ({ words }) => {
   time.setSeconds(time.getSeconds() + 30);
   const { seconds } = useTimer({ expiryTimestamp: time, onExpire: () => endGame() });
 
-  if (gameFinished && player1Score && player2Score) {
+  if (gameFinished && player1Score !== null && player2Score !== null) {
     return <GameFinished player1Score={player1Score} player2Score={player2Score} />;
   }
   return (

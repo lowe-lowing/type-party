@@ -1,10 +1,11 @@
-import { appRouter } from "@/server";
+import { appRouter } from "@/lib/trpc/server/router/_app";
 import { httpBatchLink } from "@trpc/client";
+import { getUrl } from "./utils";
 
 export const serverClient = appRouter.createCaller({
   links: [
     httpBatchLink({
-      url: `${process.env.VERCEL_URL || "http://localhost:3000/"}api/trpc`,
+      url: getUrl(),
     }),
   ],
 });

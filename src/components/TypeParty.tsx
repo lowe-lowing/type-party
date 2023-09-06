@@ -1,5 +1,5 @@
 "use client";
-import { trpc } from "@/app/_trpc/client";
+import { trpc } from "@/lib/trpc/client";
 import { PusherEvent, usePusher } from "@/hooks/usePusher";
 import { useSearchParams } from "next/navigation";
 import { generate } from "random-words";
@@ -7,6 +7,8 @@ import { useState, type FC } from "react";
 import ConnectedIndicator from "./ConnectedIndicator";
 import GameStarting from "./GameStarting";
 import { Button } from "./ui/button";
+import { TriggerPayload } from "@/app/api/pusher/route";
+import axios from "axios";
 
 interface TypePartyProps {}
 
@@ -40,23 +42,25 @@ const TypeParty: FC<TypePartyProps> = ({}) => {
     } as PusherEvent<string[]>,
   ]);
 
-  const { mutate: trigger } = trpc.pusher.trigger.useMutation();
+  // const { mutate: trigger } = trpc.pusher.trigger.useMutation();
 
   const readyUp = () => {
-    trigger({
-      channel: "game",
-      event: "ready_up",
-      data: player,
-    });
+    axios.post("/api/pusher", { channel: "game", event: "ready_up", data: player } as TriggerPayload);
+    // trigger({
+    //   channel: "game",
+    //   event: "ready_up",
+    //   data: player,
+    // });
   };
 
   const startGame = async () => {
     const data = generate(50);
-    trigger({
-      channel: "game",
-      event: "start_game",
-      data,
-    });
+    axios.post("/api/pusher", { channel: "game", event: "start_game", data } as TriggerPayload);
+    // trigger({
+    //   channel: "game",
+    //   event: "start_game",
+    //   data,
+    // });
   };
 
   if (gameStarted) {

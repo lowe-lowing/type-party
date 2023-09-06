@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import TrpcClientProvider from "./_trpc/provider";
+import TrpcClientProvider from "../lib/trpc/provider";
 import Navbar from "@/components/Navbar/Navbar";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import { Separator } from "@/components/ui/separator";
