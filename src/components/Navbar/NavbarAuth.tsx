@@ -10,16 +10,16 @@ import { authOptions, getUserAuth } from "@/lib/auth";
 
 // export const runtime = "edge";
 
-const getUser = async () => {
-  const res = await fetch(`${getBaseUrl()}/api/auth/user`, { cache: "no-store" });
-  const json = await res.json();
-  console.log(json);
+// const getUser = async () => {
+//   const res = await fetch(`${getBaseUrl()}/api/auth/user`, { cache: "no-store" });
+//   const json = await res.json();
+//   console.log(json);
 
-  return json.user;
-};
+//   return json.user;
+// };
 
 export default async function NavbarAuth() {
-  const user = await getUser();
+  //   const user = await getUser();
   const { session } = await getUserAuth();
   console.log(session?.user);
 
