@@ -5,7 +5,6 @@ import { useState, type FC } from "react";
 import { useTimer } from "react-timer-hook";
 import GameFinished from "./GameFinished";
 import { PusherEvent, usePusher } from "@/hooks/usePusher";
-import { trpc } from "@/lib/trpc/client";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import { TriggerPayload } from "@/app/api/pusher/route";
@@ -60,7 +59,6 @@ const TypingClient: FC<TypingClientProps> = ({ words }) => {
     } as PusherEvent<GameFinishedData>,
   ]);
 
-  // const { mutateAsync: trigger } = trpc.pusher.trigger.useMutation();
   const extractWPM = () => {
     const completedWords = wordsState.filter((word) => {
       const removeLastLetter = word.letters.slice(0, -1);
@@ -84,14 +82,6 @@ const TypingClient: FC<TypingClientProps> = ({ words }) => {
         score,
       } as GameFinishedData,
     } as TriggerPayload);
-    // await trigger({
-    //   channel: "game",
-    //   event: "game_finished",
-    //   data: {
-    //     player: parseInt(player),
-    //     score,
-    //   } as GameFinishedData,
-    // });
     setGameFinished(true);
   };
 

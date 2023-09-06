@@ -1,5 +1,4 @@
 "use client";
-import { trpc } from "@/lib/trpc/client";
 import { PusherEvent, usePusher } from "@/hooks/usePusher";
 import { useSearchParams } from "next/navigation";
 import { generate } from "random-words";
@@ -42,25 +41,13 @@ const TypeParty: FC<TypePartyProps> = ({}) => {
     } as PusherEvent<string[]>,
   ]);
 
-  // const { mutate: trigger } = trpc.pusher.trigger.useMutation();
-
   const readyUp = () => {
     axios.post("/api/pusher", { channel: "game", event: "ready_up", data: player } as TriggerPayload);
-    // trigger({
-    //   channel: "game",
-    //   event: "ready_up",
-    //   data: player,
-    // });
   };
 
   const startGame = async () => {
     const data = generate(50);
     axios.post("/api/pusher", { channel: "game", event: "start_game", data } as TriggerPayload);
-    // trigger({
-    //   channel: "game",
-    //   event: "start_game",
-    //   data,
-    // });
   };
 
   if (gameStarted) {

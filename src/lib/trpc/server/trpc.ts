@@ -19,13 +19,9 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   }
   return next({
     ctx: {
-      // infers the `session` as non-nullable
       session: { ...ctx.session, user: ctx.session.user },
     },
   });
 });
 
-/**
- * Protected procedure
- **/
 export const protectedProcedure = t.procedure.use(isAuthed);
