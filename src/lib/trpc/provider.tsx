@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 import { trpc } from "./client";
 import SuperJSON from "superjson";
-import { getUrl } from "./utils";
+import { getUrl, getUrlAuth } from "./utils";
 
 export default function TrpcClientProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({}));
@@ -15,6 +15,9 @@ export default function TrpcClientProvider({ children }: { children: React.React
       links: [
         httpBatchLink({
           url: getUrl(),
+        }),
+        httpBatchLink({
+          url: getUrlAuth(),
         }),
       ],
     })

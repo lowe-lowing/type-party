@@ -7,3 +7,7 @@ const getBaseUrl = () => {
 export function getUrl() {
   return getBaseUrl() + "/api/trpc";
 }
+
+export function getUrlAuth() {
+  return getBaseUrl() + "/api/trpc-auth";
+}

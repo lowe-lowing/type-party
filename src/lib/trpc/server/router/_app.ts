@@ -1,7 +1,7 @@
 import { todos } from "@/lib/db/schema/todos";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { publicProcedure, router } from "../trpc";
+import { protectedProcedure, publicProcedure, router } from "../trpc";
 import { db } from "@/lib/db";
 
 export const appRouter = router({
@@ -21,6 +21,12 @@ export const appRouter = router({
     .mutation(async (opts) => {
       return db.update(todos).set({ done: opts.input.done }).where(eq(todos.id, opts.input.id));
     }),
+});
+
+export const appRouterAuth = router({
+  getUser: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.session?.user;
+  }),
 });
 
 export type AppRouter = typeof appRouter;
