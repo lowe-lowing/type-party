@@ -1,13 +1,11 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import TrpcClientProvider from "../components/providers/TrpcClientProvider";
 import Navbar from "@/components/Navbar/Navbar";
-import { ThemeProvider } from "../components/providers/ThemeProvider";
-import { Separator } from "@/components/ui/separator";
 import AuthProvider from "@/components/providers/AuthProvider";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Separator } from "@/components/ui/separator";
+import { parse } from "@/hooks/utils";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import TrpcClientProvider from "../components/providers/TrpcClientProvider";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Test App",
@@ -15,18 +13,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const theme = cookies().get("dark-theme")?.value;
+  const themeClass = theme ? (parse(theme) ? "dark" : "") : "dark";
+
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={themeClass}>
         <AuthProvider>
           <TrpcClientProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark">
-              <div className="min-h-screen grid" style={{ gridTemplateRows: "auto auto 1fr" }}>
-                <Navbar />
-                <Separator />
-                <div className="container">{children}</div>
-              </div>
-            </ThemeProvider>
+            <div className="min-h-screen grid" style={{ gridTemplateRows: "auto auto 1fr" }}>
+              <Navbar />
+              <Separator />
+              <div className="container">{children}</div>
+            </div>
           </TrpcClientProvider>
         </AuthProvider>
       </body>

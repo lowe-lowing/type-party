@@ -1,20 +1,25 @@
 "use client";
+import useDarkMode from "@/hooks/useDarkMode";
+import { Moon, Sun } from "lucide-react";
 import { type FC } from "react";
 import { Button } from "../ui/button";
-import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
 
-const NavbarThemeToggle: FC = () => {
-  const { theme, setTheme } = useTheme();
+interface Props {
+  initial: boolean;
+}
+
+const NavbarThemeToggle: FC<Props> = ({ initial }) => {
+  const [enabled, setEnabled] = useDarkMode(initial);
+
   return (
     <Button
       variant={"outline"}
       size={"icon"}
       onClick={() => {
-        setTheme(theme === "light" ? "dark" : "light");
+        setEnabled(!enabled);
       }}
     >
-      {theme === "dark" ? <Sun className="h-8 w-8 sm:h-6 sm:w-6" /> : <Moon className="h-8 w-8 sm:h-6 sm:w-6" />}
+      {enabled ? <Sun className="h-8 w-8 sm:h-6 sm:w-6" /> : <Moon className="h-8 w-8 sm:h-6 sm:w-6" />}
     </Button>
   );
 };

@@ -2,8 +2,6 @@ import TodoList from "@/components/TodoList";
 import { serverClient } from "@/lib/trpc/serverClient";
 import Link from "next/link";
 
-// export const runtime = "edge";
-
 export default async function Todos() {
   const todos = await serverClient.getTodos();
   return (

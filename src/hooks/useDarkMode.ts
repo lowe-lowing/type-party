@@ -1,17 +1,18 @@
-// import { useEffect } from "react";
-// import { useLocalStorage } from "./useLocalStorage";
+import { setCookie } from "cookies-next";
+import { useEffect, useState } from "react";
 
-// const useDarkMode = () => {
-//   const [enabled, setEnabled] = useLocalStorage("dark-theme", true);
+const useDarkMode = (initial: boolean) => {
+  const [enabled, setEnabled] = useState(initial);
 
-//   useEffect(() => {
-//     const className = "dark";
-//     const bodyClass = window.document.body.classList;
+  useEffect(() => {
+    const className = "dark";
+    const bodyClass = window.document.body.classList;
 
-//     enabled ? bodyClass.add(className) : bodyClass.remove(className);
-//   }, [enabled]);
+    enabled ? bodyClass.add(className) : bodyClass.remove(className);
+    enabled ? setCookie("dark-theme", "true") : setCookie("dark-theme", "false");
+  }, [enabled]);
 
-//   return [enabled, setEnabled] as const;
-// };
+  return [enabled, setEnabled] as const;
+};
 
-// export default useDarkMode;
+export default useDarkMode;
